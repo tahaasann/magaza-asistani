@@ -1,0 +1,15 @@
+# Gizli bilgiler
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+dist/
+build/
+
+# Araç önbellekleri
+.ruff_cache/
+.pytest_cache/
