@@ -20,6 +20,7 @@
 ## İstisnalar ve dikkat edilecekler
 
 - Kaydı açılmamış ürün atılmaz. Önce kayıt, sonra imha yapılır.
+- "Kusurlu ürün" veya "SKT geçmiş satış" nedeniyle iade edilen ürünlerin fire kaydı iade ekranından otomatik açılır, çalışan ayrıca kayıt girmez.
 - Fire Alanı'ndaki ürünler en fazla 48 saat bekler, sonra atık firmasına teslim edilir.
 - Haftalık fire tutarı mağaza cirosunun yüzde 2'sini aşarsa mağaza müdürü nedenini bölge müdürüne yazılı olarak bildirir.
 - Soğuk zincir kaybında soğutucu arızası prosedürü de uygulanır.

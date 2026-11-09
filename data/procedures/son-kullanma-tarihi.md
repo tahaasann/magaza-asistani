@@ -8,7 +8,7 @@
 
 ## Adımlar
 
-1. Her sabah mağaza açılmadan önce, açılıştan en az 30 dakika önce SKT kontrolüne başlayın.
+1. Her sabah, mağaza açılışından en az 30 dakika önce SKT kontrolüne başlayın.
 2. Süt, et ve şarküteri reyonlarını her gün, kuru gıda reyonlarını haftada bir kontrol edin.
 3. SKT'si bugün veya daha önce dolmuş ürünü hemen raftan alın.
 4. SKT'sine 2 gün veya daha az kalan soğuk zincir ürünlerini rafın önüne alın ve "Yakın Tarih" etiketi yapıştırın.
@@ -22,4 +22,4 @@
 - SKT'si geçmiş ürün hiçbir koşulda satılmaz, indirime sokulmaz ve çalışanlara verilmez.
 - Tarihi okunamayan ürün SKT'si geçmiş kabul edilir.
 - Aynı üründen tek seferde 20 adetten fazla çıkış olursa mağaza müdürü sipariş miktarını bölge müdürüne bildirir.
-- Müşteri, SKT'si satış tarihinden önce geçmiş bir ürün getirirse iade prosedürü uygulanır.
+- Müşteri, SKT'si satış tarihine eşit veya ondan önce olan bir ürün getirirse iade prosedürü uygulanır.
