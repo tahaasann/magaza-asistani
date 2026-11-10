@@ -1,7 +1,8 @@
-"""Gemini API'ye SDK kullanmadan, ham HTTP ile istek atan en küçük istemci.
+"""Gemini Interactions API'ye SDK kullanmadan, ham HTTP ile istek atan en küçük istemci.
 
 Amaç, framework'lerin arka planda ne yaptığını görmek: bir LLM çağrısı aslında
-JSON gövdeli tek bir HTTP POST isteğidir.
+JSON gövdeli tek bir HTTP POST isteğidir. Haziran 2026'dan beri varsayılan arayüz
+Interactions API'dir; eski ``generateContent`` legacy sayılır (MA-007).
 """
 
 import os
@@ -13,7 +14,7 @@ import httpx
 # 3.5 Flash-Lite ve 3.1 Flash-Lite temperature'ı pratikte yok sayıyor (2026-11-10 deneyi);
 # 3 Flash Preview ise tepki veriyor. Preview modeller değişebilir: kaldırılırsa burası güncellenir.
 DEFAULT_MODEL = "gemini-3-flash-preview"
-API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+API_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
 API_KEY_ENV = "GEMINI_API_KEY"
 TIMEOUT_SECONDS = 30.0
 
@@ -50,35 +51,45 @@ def _raise_for_error(response: httpx.Response) -> None:
     raise GeminiAPIError(response.status_code, message)
 
 
-def _build_body(prompt: str, system: str | None, temperature: float) -> dict[str, Any]:
-    """İstek gövdesini (JSON) Gemini'nin beklediği biçimde kurar."""
+def _build_body(model: str, prompt: str, system: str | None, temperature: float) -> dict[str, Any]:
+    """İstek gövdesini (JSON) Interactions API'nin beklediği biçimde kurar."""
     body: dict[str, Any] = {
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": temperature},
+        "model": model,
+        "input": prompt,
+        "generation_config": {"temperature": temperature},
+        # Varsayılan store=true her isteği Google tarafında saklar. Biz durumsuz çalışıyoruz
+        # (previous_interaction_id kullanmıyoruz), bu yüzden veri bırakmayız (KVKK).
+        "store": False,
     }
     # System prompt yalnızca verildiyse eklenir; boş bir talimat göndermeyiz.
     if system is not None:
-        body["systemInstruction"] = {"parts": [{"text": system}]}
+        body["system_instruction"] = system
     return body
 
 
 def _parse_response(data: dict[str, Any]) -> LLMResponse:
     """Yanıt gövdesinden metni ve token sayılarını çıkarır."""
-    candidates = data.get("candidates") or []
-    if not candidates:
-        # Örneğin güvenlik filtresi istemi engellediyse aday yanıt gelmez.
-        raise ValueError(f"Model yanıt üretmedi: {data.get('promptFeedback')}")
-    parts = candidates[0].get("content", {}).get("parts", [])
-    text = "".join(part.get("text", "") for part in parts)
+    status = data.get("status")
+    if status != "completed":
+        # Ör. token sınırında kesilirse "incomplete", sunucu hatasında "failed" gelir.
+        raise ValueError(f"Model yanıtı tamamlanmadı (status: {status})")
+    # Yanıt adımlardan oluşur: "thought" (düşünme) adımlarında kullanıcıya metin yoktur;
+    # cevap yalnızca "model_output" adımlarının text öğelerindedir.
+    text = "".join(
+        item.get("text", "")
+        for step in data.get("steps", [])
+        if step.get("type") == "model_output"
+        for item in step.get("content", [])
+        if item.get("type") == "text"
+    )
     if not text:
-        # Token sınırı ya da güvenlik nedeniyle kesilen yanıtı sessizce "" olarak döndürmeyiz.
-        reason = candidates[0].get("finishReason")
-        raise ValueError(f"Model boş yanıt döndü (finishReason: {reason})")
-    usage = data.get("usageMetadata", {})
+        # Boş cevabı sessizce "" olarak döndürmeyiz.
+        raise ValueError(f"Model boş yanıt döndü (status: {status})")
+    usage = data.get("usage", {})
     return LLMResponse(
         text=text,
-        input_tokens=usage.get("promptTokenCount", 0),
-        output_tokens=usage.get("candidatesTokenCount", 0),
+        input_tokens=usage.get("total_input_tokens", 0),
+        output_tokens=usage.get("total_output_tokens", 0),
     )
 
 
@@ -101,14 +112,13 @@ def ask(
 
     # Anahtar URL'ye değil header'a konur: URL'ler log'lara düşer.
     headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
-    url = API_URL.format(model=model)
-    body = _build_body(prompt, system, temperature)
+    body = _build_body(model, prompt, system, temperature)
 
     if client is None:
         with httpx.Client(timeout=TIMEOUT_SECONDS) as own_client:
-            response = own_client.post(url, headers=headers, json=body)
+            response = own_client.post(API_URL, headers=headers, json=body)
     else:
-        response = client.post(url, headers=headers, json=body)
+        response = client.post(API_URL, headers=headers, json=body)
 
     _raise_for_error(response)
     return _parse_response(response.json())
