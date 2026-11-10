@@ -1,0 +1,6 @@
+{
+  "error": {
+    "message": "Model 'gemini-bu-model-yok' not found. Did you mean 'gemini-4-carbon'? Please verify the model name against the supported list: https://ai.google.dev/gemini-api/docs/models",
+    "code": "not_found"
+  }
+}
