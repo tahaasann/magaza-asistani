@@ -10,8 +10,9 @@ from typing import Any
 
 import httpx
 
-# temperature, Gemini 3.6 Flash ve sonrasında yok sayılıyor; bu yüzden 3.5 Flash-Lite.
-DEFAULT_MODEL = "gemini-3.5-flash-lite"
+# 3.5 Flash-Lite ve 3.1 Flash-Lite temperature'ı pratikte yok sayıyor (2026-11-10 deneyi);
+# 3 Flash Preview ise tepki veriyor. Preview modeller değişebilir: kaldırılırsa burası güncellenir.
+DEFAULT_MODEL = "gemini-3-flash-preview"
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 API_KEY_ENV = "GEMINI_API_KEY"
 TIMEOUT_SECONDS = 30.0
