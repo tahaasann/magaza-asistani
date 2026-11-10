@@ -20,7 +20,7 @@ def main() -> None:
     load_dotenv()
     # Windows konsolu varsayılan olarak cp1252 kullanır ve "ı", "ş" gibi harfleri basamaz.
     sys.stdout.reconfigure(encoding="utf-8")
-    for temperature in (0.0, 1.0):
+    for temperature in (0.0, 2.0):
         print(f"\n=== temperature={temperature} ===")
         for run in range(1, RUNS + 1):
             result = ask(PROMPT, system=SYSTEM, temperature=temperature)

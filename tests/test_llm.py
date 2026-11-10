@@ -6,7 +6,7 @@ from collections.abc import Callable
 import httpx
 import pytest
 
-from magaza_asistani.llm import DEFAULT_MODEL, LLMResponse, ask
+from magaza_asistani.llm import DEFAULT_MODEL, GeminiAPIError, LLMResponse, ask
 
 FAKE_KEY = "test-key-123"
 
@@ -94,12 +94,41 @@ def test_missing_api_key_raises(monkeypatch: pytest.MonkeyPatch) -> None:
 @pytest.mark.parametrize("status", [400, 429, 500])
 def test_http_error_raises_without_leaking_key(status: int) -> None:
     client, _ = make_client(status=status, body={"error": {"message": "hata"}})
-    with pytest.raises(httpx.HTTPStatusError) as exc_info:
+    with pytest.raises(GeminiAPIError) as exc_info:
         ask("Selam", client=client)
+    assert exc_info.value.status_code == status
     assert FAKE_KEY not in str(exc_info.value)
+
+
+def test_http_error_carries_google_message() -> None:
+    # 429'un asıl nedeni (ör. free tier kotası 0) hata mesajında görünmeli.
+    body = {"error": {"status": "RESOURCE_EXHAUSTED", "message": "Quota exceeded, limit: 0"}}
+    client, _ = make_client(status=429, body=body)
+    with pytest.raises(GeminiAPIError, match="limit: 0") as exc_info:
+        ask("Selam", client=client)
+    assert exc_info.value.message == "Quota exceeded, limit: 0"
+
+
+def test_http_error_with_non_json_body() -> None:
+    # Proxy'nin HTML hata sayfası gibi JSON olmayan gövdede de anlaşılır hata vermeli.
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(502, text="<html>Bad Gateway</html>")
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    with pytest.raises(GeminiAPIError, match="502") as exc_info:
+        ask("Selam", client=client)
+    assert exc_info.value.message == ""
 
 
 def test_no_candidates_raises() -> None:
     client, _ = make_client(body={"promptFeedback": {"blockReason": "SAFETY"}})
     with pytest.raises(ValueError, match="SAFETY"):
+        ask("Selam", client=client)
+
+
+def test_empty_text_raises_with_finish_reason() -> None:
+    # Yanıt token sınırında kesilip metin boş geldiyse sessizce "" dönmemeli.
+    body = {"candidates": [{"content": {"parts": []}, "finishReason": "MAX_TOKENS"}]}
+    client, _ = make_client(body=body)
+    with pytest.raises(ValueError, match="MAX_TOKENS"):
         ask("Selam", client=client)

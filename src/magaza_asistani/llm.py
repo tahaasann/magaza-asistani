@@ -27,6 +27,29 @@ class LLMResponse:
     output_tokens: int
 
 
+class GeminiAPIError(RuntimeError):
+    """API 4xx/5xx döndüğünde fırlatılır; Google'ın açıklamasını taşır, anahtarı asla taşımaz."""
+
+    def __init__(self, status_code: int, message: str) -> None:
+        self.status_code = status_code
+        self.message = message
+        super().__init__(f"Gemini API hatası {status_code}: {message or '(açıklama yok)'}")
+
+
+def _raise_for_error(response: httpx.Response) -> None:
+    """Yanıt başarısızsa, gövdedeki ``error.message`` ile birlikte GeminiAPIError fırlatır."""
+    if not response.is_error:
+        return
+    try:
+        data = response.json()
+    except ValueError:
+        # Gövde JSON değilse (ör. bir proxy'nin HTML hata sayfası) açıklamasız devam ederiz.
+        data = None
+    error = data.get("error", {}) if isinstance(data, dict) else {}
+    message = error.get("message", "") if isinstance(error, dict) else ""
+    raise GeminiAPIError(response.status_code, message)
+
+
 def _build_body(prompt: str, system: str | None, temperature: float) -> dict[str, Any]:
     """İstek gövdesini (JSON) Gemini'nin beklediği biçimde kurar."""
     body: dict[str, Any] = {
@@ -47,6 +70,10 @@ def _parse_response(data: dict[str, Any]) -> LLMResponse:
         raise ValueError(f"Model yanıt üretmedi: {data.get('promptFeedback')}")
     parts = candidates[0].get("content", {}).get("parts", [])
     text = "".join(part.get("text", "") for part in parts)
+    if not text:
+        # Token sınırı ya da güvenlik nedeniyle kesilen yanıtı sessizce "" olarak döndürmeyiz.
+        reason = candidates[0].get("finishReason")
+        raise ValueError(f"Model boş yanıt döndü (finishReason: {reason})")
     usage = data.get("usageMetadata", {})
     return LLMResponse(
         text=text,
@@ -83,6 +110,5 @@ def ask(
     else:
         response = client.post(url, headers=headers, json=body)
 
-    # 4xx/5xx durumunda hata fırlatır; mesajda yalnızca URL ve durum kodu olur, anahtar olmaz.
-    response.raise_for_status()
+    _raise_for_error(response)
     return _parse_response(response.json())
