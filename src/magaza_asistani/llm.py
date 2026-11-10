@@ -11,8 +11,9 @@ from typing import Any
 
 import httpx
 
-# 3.5 Flash-Lite ve 3.1 Flash-Lite temperature'ı pratikte yok sayıyor (2026-11-10 deneyi);
-# 3 Flash Preview ise tepki veriyor. Preview modeller değişebilir: kaldırılırsa burası güncellenir.
+# 3.5 Flash-Lite ve 3.1 Flash-Lite temperature'ı pratikte yok sayıyor (2026-11-10, generateContent);
+# 3 Flash Preview tepki veriyor. Interactions API'de de doğrulandı (2026-11-10): temperature 0'da
+# 3 cevabın 3'ü aynı, 2.0'da 3'ü farklı. Preview modeller değişebilir: kaldırılırsa güncellenir.
 DEFAULT_MODEL = "gemini-3-flash-preview"
 API_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
 API_KEY_ENV = "GEMINI_API_KEY"
@@ -77,9 +78,10 @@ def _parse_response(data: dict[str, Any]) -> LLMResponse:
     # cevap yalnızca "model_output" adımlarının text öğelerindedir.
     text = "".join(
         item.get("text", "")
-        for step in data.get("steps", [])
+        # `or []`: alan hiç yoksa da null gelirse de boş liste gibi davranırız.
+        for step in data.get("steps") or []
         if step.get("type") == "model_output"
-        for item in step.get("content", [])
+        for item in step.get("content") or []
         if item.get("type") == "text"
     )
     if not text:

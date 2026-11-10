@@ -165,9 +165,17 @@ def test_not_completed_status_raises(status: str | None) -> None:
         ask("Selam", client=client)
 
 
-def test_empty_text_raises() -> None:
-    # Tamamlanmış ama yalnızca düşünme adımı içeren yanıt sessizce "" dönmemeli.
-    body = {"status": "completed", "steps": [{"type": "thought", "signature": "x"}]}
+@pytest.mark.parametrize(
+    "steps",
+    [
+        [{"type": "thought", "signature": "x"}],  # yalnızca düşünme adımı
+        None,  # steps alanı null
+        [{"type": "model_output", "content": None}],  # content alanı null
+    ],
+)
+def test_empty_text_raises(steps: list | None) -> None:
+    # Metinsiz tamamlanmış yanıt: çökmemeli, sessizce "" de dönmemeli; açık hata vermeli.
+    body = {"status": "completed", "steps": steps}
     client, _ = make_client(body=body)
     with pytest.raises(ValueError, match="boş yanıt"):
         ask("Selam", client=client)
