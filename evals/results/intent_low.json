@@ -1,0 +1,181 @@
+{
+  "level": "low",
+  "model": "gemini-3-flash-preview",
+  "run_at": "2026-11-11T14:53:37+00:00",
+  "records": [
+    {
+      "id": "p1",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 184,
+      "output_tokens": 6,
+      "thought_tokens": 236,
+      "seconds": 2.39
+    },
+    {
+      "id": "p2",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 184,
+      "output_tokens": 6,
+      "thought_tokens": 261,
+      "seconds": 2.8
+    },
+    {
+      "id": "p3",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 186,
+      "output_tokens": 6,
+      "thought_tokens": 272,
+      "seconds": 2.15
+    },
+    {
+      "id": "p4",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 181,
+      "output_tokens": 6,
+      "thought_tokens": 212,
+      "seconds": 2.12
+    },
+    {
+      "id": "p5",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 185,
+      "output_tokens": 6,
+      "thought_tokens": 271,
+      "seconds": 3.22
+    },
+    {
+      "id": "d1",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 181,
+      "output_tokens": 6,
+      "thought_tokens": 221,
+      "seconds": 2.19
+    },
+    {
+      "id": "d2",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 180,
+      "output_tokens": 6,
+      "thought_tokens": 266,
+      "seconds": 2.34
+    },
+    {
+      "id": "d3",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 178,
+      "output_tokens": 6,
+      "thought_tokens": 209,
+      "seconds": 2.22
+    },
+    {
+      "id": "d4",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 182,
+      "output_tokens": 6,
+      "thought_tokens": 270,
+      "seconds": 2.44
+    },
+    {
+      "id": "d5",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 181,
+      "output_tokens": 6,
+      "thought_tokens": 239,
+      "seconds": 10.43
+    },
+    {
+      "id": "a1",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 184,
+      "output_tokens": 6,
+      "thought_tokens": 300,
+      "seconds": 2.38
+    },
+    {
+      "id": "a2",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 186,
+      "output_tokens": 6,
+      "thought_tokens": 219,
+      "seconds": 2.07
+    },
+    {
+      "id": "a3",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 185,
+      "output_tokens": 6,
+      "thought_tokens": 276,
+      "seconds": 2.61
+    },
+    {
+      "id": "a4",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 187,
+      "output_tokens": 6,
+      "thought_tokens": 256,
+      "seconds": 1.92
+    },
+    {
+      "id": "a5",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 187,
+      "output_tokens": 6,
+      "thought_tokens": 269,
+      "seconds": 2.45
+    },
+    {
+      "id": "u1",
+      "expected": "unknown",
+      "label": "unknown",
+      "input_tokens": 179,
+      "output_tokens": 6,
+      "thought_tokens": 235,
+      "seconds": 2.03
+    },
+    {
+      "id": "u2",
+      "expected": "unknown",
+      "label": null,
+      "error": "API 429: Rate limit exceeded for model gemini-3-flash (limit: 20 requests per day on Free Tier). Please retry in 17h6m22s or upgrade your tier at https://ai.dev/rate-limit."
+    },
+    {
+      "id": "u3",
+      "expected": "unknown",
+      "label": "unknown",
+      "input_tokens": 179,
+      "output_tokens": 6,
+      "thought_tokens": 245,
+      "seconds": 2.15
+    },
+    {
+      "id": "u4",
+      "expected": "unknown",
+      "label": "unknown",
+      "input_tokens": 183,
+      "output_tokens": 6,
+      "thought_tokens": 268,
+      "seconds": 2.22
+    },
+    {
+      "id": "u5",
+      "expected": "unknown",
+      "label": null,
+      "error": "API 429: Rate limit exceeded for model gemini-3-flash (limit: 20 requests per day on Free Tier). Please retry in 17h18m55s or upgrade your tier at https://ai.dev/rate-limit."
+    }
+  ]
+}

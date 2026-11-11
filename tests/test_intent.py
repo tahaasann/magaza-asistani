@@ -5,15 +5,18 @@
 """
 
 import json
+from collections import Counter
 from pathlib import Path
+from typing import get_args
 
 import httpx
 import pytest
 
-from magaza_asistani.intent import Intent, classify_intent
+from magaza_asistani.intent import Intent, IntentLabel, classify_intent
 from magaza_asistani.llm import ThinkingLevel
 
 FIXTURES = Path(__file__).parent / "fixtures"
+EVAL_CASES = Path(__file__).parents[1] / "evals" / "intent_cases.json"
 INTENT_OK = json.loads((FIXTURES / "interaction_intent_ok.json").read_text(encoding="utf-8"))
 
 
@@ -92,3 +95,13 @@ def test_invalid_model_output_raises(text: str) -> None:
     client, _ = make_client(body_with_text(text))
     with pytest.raises(ValueError, match="şemaya uymayan"):
         classify_intent("Selam", client=client)
+
+
+def test_eval_cases_are_well_formed() -> None:
+    # Eval setindeki bir yazım hatası (ör. "procedur") ölçümü sessizce bozar; önce seti sınarız.
+    cases = json.loads(EVAL_CASES.read_text(encoding="utf-8"))
+    ids = [case["id"] for case in cases]
+    assert len(ids) == len(set(ids)), "id'ler tekil olmalı"
+    labels = Counter(case["expected"] for case in cases)
+    assert set(labels) == set(get_args(IntentLabel))
+    assert min(labels.values()) >= 5, "her etiketten en az 5 soru olmalı"

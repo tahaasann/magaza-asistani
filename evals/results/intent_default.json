@@ -1,0 +1,175 @@
+{
+  "level": "default",
+  "model": "gemini-3-flash-preview",
+  "run_at": "2026-11-11T14:53:37+00:00",
+  "records": [
+    {
+      "id": "p1",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 184,
+      "output_tokens": 6,
+      "thought_tokens": 246,
+      "seconds": 2.12
+    },
+    {
+      "id": "p2",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 184,
+      "output_tokens": 6,
+      "thought_tokens": 221,
+      "seconds": 2.04
+    },
+    {
+      "id": "p3",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 186,
+      "output_tokens": 6,
+      "thought_tokens": 320,
+      "seconds": 2.81
+    },
+    {
+      "id": "p4",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 181,
+      "output_tokens": 5,
+      "thought_tokens": 264,
+      "seconds": 2.27
+    },
+    {
+      "id": "p5",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 185,
+      "output_tokens": 6,
+      "thought_tokens": 290,
+      "seconds": 4.67
+    },
+    {
+      "id": "d1",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 181,
+      "output_tokens": 6,
+      "thought_tokens": 202,
+      "seconds": 2.07
+    },
+    {
+      "id": "d2",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 180,
+      "output_tokens": 5,
+      "thought_tokens": 223,
+      "seconds": 2.29
+    },
+    {
+      "id": "d3",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 178,
+      "output_tokens": 5,
+      "thought_tokens": 242,
+      "seconds": 2.13
+    },
+    {
+      "id": "d4",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 182,
+      "output_tokens": 5,
+      "thought_tokens": 250,
+      "seconds": 3.18
+    },
+    {
+      "id": "d5",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 181,
+      "output_tokens": 6,
+      "thought_tokens": 224,
+      "seconds": 2.05
+    },
+    {
+      "id": "a1",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 184,
+      "output_tokens": 5,
+      "thought_tokens": 284,
+      "seconds": 2.14
+    },
+    {
+      "id": "a2",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 186,
+      "output_tokens": 5,
+      "thought_tokens": 296,
+      "seconds": 2.15
+    },
+    {
+      "id": "a3",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 185,
+      "output_tokens": 5,
+      "thought_tokens": 275,
+      "seconds": 2.12
+    },
+    {
+      "id": "a4",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 187,
+      "output_tokens": 5,
+      "thought_tokens": 225,
+      "seconds": 2.71
+    },
+    {
+      "id": "a5",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 187,
+      "output_tokens": 6,
+      "thought_tokens": 234,
+      "seconds": 2.5
+    },
+    {
+      "id": "u1",
+      "expected": "unknown",
+      "label": "unknown",
+      "input_tokens": 179,
+      "output_tokens": 5,
+      "thought_tokens": 252,
+      "seconds": 2.32
+    },
+    {
+      "id": "u2",
+      "expected": "unknown",
+      "label": null,
+      "error": "API 429: Rate limit exceeded for model gemini-3-flash (limit: 20 requests per day on Free Tier). Please retry in 17h6m22s or upgrade your tier at https://ai.dev/rate-limit."
+    },
+    {
+      "id": "u3",
+      "expected": "unknown",
+      "label": null,
+      "error": "atlandı: sorulmadı"
+    },
+    {
+      "id": "u4",
+      "expected": "unknown",
+      "label": null,
+      "error": "atlandı: sorulmadı"
+    },
+    {
+      "id": "u5",
+      "expected": "unknown",
+      "label": null,
+      "error": "atlandı: sorulmadı"
+    }
+  ]
+}
