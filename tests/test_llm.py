@@ -54,6 +54,7 @@ def test_returns_text_and_token_counts() -> None:
         text="Tazelik ve uygun fiyatın yeni adresi mahallenizde sizi bekliyor.",
         input_tokens=31,
         output_tokens=18,
+        thought_tokens=274,
     )
 
 
@@ -97,6 +98,44 @@ def test_system_instruction_only_when_given(
     client, seen = make_client()
     ask("Selam", system=system, client=client)
     assert check(sent_json(seen[0]))
+
+
+def test_optional_fields_absent_by_default() -> None:
+    # Yeni parametreler verilmezse gövde eskisiyle birebir aynı kalmalı (geriye uyumluluk).
+    client, seen = make_client()
+    ask("Selam", client=client)
+    body = sent_json(seen[0])
+    assert "response_format" not in body
+    assert body["generation_config"] == {"temperature": 0.0}
+
+
+def test_response_format_sent_at_top_level() -> None:
+    fmt = {"type": "text", "mime_type": "application/json", "schema": {"type": "object"}}
+    client, seen = make_client()
+    ask("Selam", response_format=fmt, client=client)
+    body = sent_json(seen[0])
+    assert body["response_format"] == fmt
+    # Dokümana göre generation_config içinde değil, üst seviyede olmalı.
+    assert "response_format" not in body["generation_config"]
+
+
+def test_thinking_level_sent_inside_generation_config() -> None:
+    client, seen = make_client()
+    ask("Selam", thinking_level="minimal", client=client)
+    body = sent_json(seen[0])
+    assert body["generation_config"] == {"temperature": 0.0, "thinking_level": "minimal"}
+    assert "thinking_level" not in body
+
+
+def test_thought_tokens_default_to_zero_when_missing() -> None:
+    # Düşünmeyen bir yanıtta usage alanı total_thought_tokens içermeyebilir.
+    body = {
+        "status": "completed",
+        "steps": [{"type": "model_output", "content": [{"type": "text", "text": "ok"}]}],
+        "usage": {"total_input_tokens": 1, "total_output_tokens": 2},
+    }
+    client, _ = make_client(body=body)
+    assert ask("Selam", client=client).thought_tokens == 0
 
 
 def test_only_model_output_text_is_returned() -> None:

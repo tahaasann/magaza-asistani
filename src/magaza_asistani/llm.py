@@ -7,7 +7,7 @@ Interactions API'dir; eski ``generateContent`` legacy sayılır (MA-007).
 
 import os
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 import httpx
 
@@ -19,6 +19,10 @@ API_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
 API_KEY_ENV = "GEMINI_API_KEY"
 TIMEOUT_SECONDS = 30.0
 
+# Modelin cevap vermeden önce ne kadar "düşüneceği".
+# Gönderilmezse modelin kendi varsayılanı geçerli olur (dokümanda yazmıyor, MA-005'te ölçülür).
+ThinkingLevel = Literal["minimal", "low", "medium", "high"]
+
 
 @dataclass(frozen=True)
 class LLMResponse:
@@ -27,6 +31,8 @@ class LLMResponse:
     text: str
     input_tokens: int
     output_tokens: int
+    # Düşünme token'ları cevapta görünmez ama faturaya girer; çoğu zaman çıktı token'ından fazladır.
+    thought_tokens: int = 0
 
 
 class GeminiAPIError(RuntimeError):
@@ -52,12 +58,22 @@ def _raise_for_error(response: httpx.Response) -> None:
     raise GeminiAPIError(response.status_code, message)
 
 
-def _build_body(model: str, prompt: str, system: str | None, temperature: float) -> dict[str, Any]:
+def _build_body(
+    model: str,
+    prompt: str,
+    system: str | None,
+    temperature: float,
+    response_format: dict[str, Any] | None = None,
+    thinking_level: ThinkingLevel | None = None,
+) -> dict[str, Any]:
     """İstek gövdesini (JSON) Interactions API'nin beklediği biçimde kurar."""
+    generation_config: dict[str, Any] = {"temperature": temperature}
+    if thinking_level is not None:
+        generation_config["thinking_level"] = thinking_level
     body: dict[str, Any] = {
         "model": model,
         "input": prompt,
-        "generation_config": {"temperature": temperature},
+        "generation_config": generation_config,
         # Varsayılan store=true her isteği Google tarafında saklar. Biz durumsuz çalışıyoruz
         # (previous_interaction_id kullanmıyoruz), bu yüzden veri bırakmayız (KVKK).
         "store": False,
@@ -65,6 +81,10 @@ def _build_body(model: str, prompt: str, system: str | None, temperature: float)
     # System prompt yalnızca verildiyse eklenir; boş bir talimat göndermeyiz.
     if system is not None:
         body["system_instruction"] = system
+    # Yapılandırılmış çıktı istenirse şema gövdenin üst seviyesine konur
+    # (generation_config içine değil; dokümanda böyle).
+    if response_format is not None:
+        body["response_format"] = response_format
     return body
 
 
@@ -92,6 +112,7 @@ def _parse_response(data: dict[str, Any]) -> LLMResponse:
         text=text,
         input_tokens=usage.get("total_input_tokens", 0),
         output_tokens=usage.get("total_output_tokens", 0),
+        thought_tokens=usage.get("total_thought_tokens", 0),
     )
 
 
@@ -101,12 +122,15 @@ def ask(
     temperature: float = 0.0,
     *,
     model: str = DEFAULT_MODEL,
+    response_format: dict[str, Any] | None = None,
+    thinking_level: ThinkingLevel | None = None,
     client: httpx.Client | None = None,
 ) -> LLMResponse:
     """Modele tek bir soru sorar ve yanıtı döndürür.
 
-    ``client`` testlerde sahte (mock) bir HTTP katmanı vermek içindir; normal
-    kullanımda boş bırakılır ve fonksiyon kendi istemcisini açıp kapatır.
+    ``response_format`` ve ``thinking_level`` verilmezse gövdeye hiç girmez; böylece
+    eski çağrılar aynen çalışır. ``client`` testlerde sahte (mock) bir HTTP katmanı
+    vermek içindir; normal kullanımda boş bırakılır ve fonksiyon kendi istemcisini açıp kapatır.
     """
     api_key = os.environ.get(API_KEY_ENV)
     if not api_key:
@@ -114,7 +138,7 @@ def ask(
 
     # Anahtar URL'ye değil header'a konur: URL'ler log'lara düşer.
     headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
-    body = _build_body(model, prompt, system, temperature)
+    body = _build_body(model, prompt, system, temperature, response_format, thinking_level)
 
     if client is None:
         with httpx.Client(timeout=TIMEOUT_SECONDS) as own_client:
