@@ -1,0 +1,38 @@
+{
+  "status": "completed",
+  "usage": {
+    "total_tokens": 259,
+    "total_input_tokens": 36,
+    "input_tokens_by_modality": [
+      {
+        "modality": "text",
+        "tokens": 36
+      }
+    ],
+    "total_cached_tokens": 0,
+    "total_output_tokens": 5,
+    "total_tool_use_tokens": 0,
+    "total_thought_tokens": 218,
+    "initial_input_tokens": 36
+  },
+  "created": "2026-11-11T12:04:53Z",
+  "updated": "2026-11-11T12:04:53Z",
+  "service_tier": "standard",
+  "steps": [
+    {
+      "signature": "EsgHCsUHAWkUfROw9hinjx42ZcTHTi7C55foRr6rgZ/Cv5gDA8LW+eXPqQ4MMstrcDjjlQGqIigu9ba42yhy6ZHN+6uY0RRb/kqPApuPkfB1wjLK3PtTHoYEvXDkaums378WJHI6B47PKQLp50tQ0N44xyjJL6jnpzLVoIzeMgVlo/XSEAB4+rj3YDKycHW9YL9FbOOdIUvtJ9dpOoGE5921Tvyg6l78olKq79rPosxKC5vRudAUXfM6K67mazSvBLD7jKprrNL+bEnTFQ6lNKXU3ttJsh0x2Sv0nYoHoO2sRW+6V51+cPPt2DCAAYMOoQv8go2VjstTRdUri5b4F9gl6PEWKuC4y7xM+RbLicnZ73FsT7/If1Ml6L9ZwR6gglD6ULg41pcDcnWO3lyvIY2uD0b2oXu182CmAL3M3Cs1Vxj0Tg0gQxZQ/ERajqzAol8Gp5/f+9ucTvP71+rP1weyqDLmvgT5/e3i5L7BRdThgyEfF82h8Jh/k/zyFMKr5jjKUMV5TAb6RR+Sec2Juy2D+MR3QBuAYTq819XnyJFMemU0ELPfCtVoFPwzZL3OHK2Q7JBGAKhWLuzJ3avn5krom5xXQzr6D4fLLZCfUzT29B1e7msga1mhKH7ujB7BxaVcXPgeff110g6tSH3Lzncf5njDzZ8f25AsMaCre/A03RaK97cKzvZr1KH0u5s2QG0L2ikKFGbZEmqejkbGi4Mjeyf0BqTafvYn2NbA6wMZG3+LjRQ9EVIVzn9rpFYlepdeonyO0wbqVmF+KuNGQzS4cjGM2g1c5EjvfYIu5obOVur1RqBCogqwh7rtC0CeA96okj+BjMl3I8ID1WNzk1q1J607cW8RkfOQBKLamOiVBkDaLUtjZuex9DQrUYIwlk5YShsZXP405/fjh1LrkkpIaGX4CDgD+ASfsiFIjgGN+GQ1NuXhcA35m+Kf9eox/FekyOELPpKw3lX/fkaUke3z9bxh5e609rSbCZ1bhH/cxgCTCUyY1O1NngHL2NKPbqVBLzitbmsSqRf9XCadWAdHWBTaVGu6W0Ld1lOdd0Uaq/T8NHw2eRa3o9mBfWYyXm5TXq4F/VGyP52MkpMFPa39R+yrZkex33l4ThGYxYz07SSLnlyODCsgNERq0GxYO2CzfjUX1qDnTMCxbYp+dkf71ornigDXwTp6VdBVUg36AdZAkKW5NDbGqnTNbbdqQgutTJZ+IcaH018ha6+wQayDVYVej4Gwt5nNbm/YaYuF9QLALQR/nbWvGSRQ/Q7odXFmleYcypvySik=",
+      "type": "thought"
+    },
+    {
+      "content": [
+        {
+          "text": "{\"label\":\"procedure\"}",
+          "type": "text"
+        }
+      ],
+      "type": "model_output"
+    }
+  ],
+  "object": "interaction",
+  "model": "gemini-3-flash-preview"
+}
