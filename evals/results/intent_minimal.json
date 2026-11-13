@@ -1,0 +1,187 @@
+{
+  "level": "minimal",
+  "model": "gemini-3-flash-preview",
+  "run_at": "2026-11-11T14:33:05+00:00",
+  "records": [
+    {
+      "id": "p1",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 184,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.65
+    },
+    {
+      "id": "p2",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 184,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.23
+    },
+    {
+      "id": "p3",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 186,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.1
+    },
+    {
+      "id": "p4",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 181,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.05
+    },
+    {
+      "id": "p5",
+      "expected": "procedure",
+      "label": "procedure",
+      "input_tokens": 185,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 3.92
+    },
+    {
+      "id": "d1",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 181,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.1
+    },
+    {
+      "id": "d2",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 180,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.13
+    },
+    {
+      "id": "d3",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 178,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.05
+    },
+    {
+      "id": "d4",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 182,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.09
+    },
+    {
+      "id": "d5",
+      "expected": "data",
+      "label": "data",
+      "input_tokens": 181,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.37
+    },
+    {
+      "id": "a1",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 184,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 0.98
+    },
+    {
+      "id": "a2",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 186,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.06
+    },
+    {
+      "id": "a3",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 185,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 0.98
+    },
+    {
+      "id": "a4",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 187,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 7.71
+    },
+    {
+      "id": "a5",
+      "expected": "action",
+      "label": "action",
+      "input_tokens": 187,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 2.48
+    },
+    {
+      "id": "u1",
+      "expected": "unknown",
+      "label": "unknown",
+      "input_tokens": 179,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.11
+    },
+    {
+      "id": "u2",
+      "expected": "unknown",
+      "label": "unknown",
+      "input_tokens": 180,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 10.62
+    },
+    {
+      "id": "u3",
+      "expected": "unknown",
+      "label": "unknown",
+      "input_tokens": 179,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 1.09
+    },
+    {
+      "id": "u4",
+      "expected": "unknown",
+      "label": "unknown",
+      "input_tokens": 183,
+      "output_tokens": 5,
+      "thought_tokens": 0,
+      "seconds": 2.55
+    },
+    {
+      "id": "u5",
+      "expected": "unknown",
+      "label": "unknown",
+      "input_tokens": 185,
+      "output_tokens": 6,
+      "thought_tokens": 0,
+      "seconds": 6.78
+    }
+  ]
+}
