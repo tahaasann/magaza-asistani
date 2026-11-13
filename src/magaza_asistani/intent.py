@@ -16,6 +16,12 @@ from magaza_asistani.llm import DEFAULT_MODEL, LLMResponse, ThinkingLevel, ask
 
 IntentLabel = Literal["procedure", "data", "action", "unknown"]
 
+# Eval (2026-11-11): minimal 20/20 doğru ve 0 düşünme token'ı; default ve low aynı doğrulukta
+# ~250 düşünme token'ı harcadı. Kalite çıtasını tutan en ucuz ayar varsayılan olur.
+DEFAULT_THINKING_LEVEL: ThinkingLevel = "minimal"
+# Şemaya uymayan cevabın hata mesajında gösterilecek en fazla karakter.
+ERROR_PREVIEW_CHARS = 100
+
 SYSTEM_PROMPT = """\
 Sen bir market zincirinin mağaza asistanında soru yönlendiricisisin.
 Mağaza çalışanının sorusunu tek bir etikete ata:
@@ -54,11 +60,14 @@ def _response_format() -> dict[str, Any]:
 def classify_intent(
     question: str,
     *,
-    thinking_level: ThinkingLevel | None = None,
+    thinking_level: ThinkingLevel | None = DEFAULT_THINKING_LEVEL,
     model: str = DEFAULT_MODEL,
     client: httpx.Client | None = None,
 ) -> Classification:
     """Soruyu dört etiketten birine atar.
+
+    ``thinking_level=None`` verilirse alan gönderilmez ve modelin kendi varsayılanı kullanılır
+    (eval bunu "default" seviyesi olarak ölçer).
 
     Şemaya uymayan cevap sessizce ``unknown`` yapılmaz, ``ValueError`` fırlatılır: böylece
     eval'de "model yanlış etiketledi" ile "model bozuk cevap verdi" birbirinden ayrılır.
@@ -76,5 +85,8 @@ def classify_intent(
     try:
         intent = Intent.model_validate_json(response.text)
     except ValidationError as exc:
-        raise ValueError(f"Model şemaya uymayan cevap döndü: {response.text!r}") from exc
+        # Ham cevap kullanıcının sorusunu tekrar ediyor olabilir (kişisel veri, KVKK);
+        # log'lara düşmesin diye yalnız başını taşırız (PR #4 review #5).
+        preview = response.text[:ERROR_PREVIEW_CHARS]
+        raise ValueError(f"Model şemaya uymayan cevap döndü: {preview!r}") from exc
     return Classification(intent=intent, response=response)

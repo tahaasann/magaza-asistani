@@ -13,9 +13,11 @@ Free Tier dakikada 5 ve günde 20 istekle sınırlı (429 mesajlarından, 2026-1
 """
 
 import argparse
+import io
 import json
 import sys
 import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -33,6 +35,34 @@ RESULTS_DIR = ROOT / "evals" / "results"
 LEVELS: dict[str, ThinkingLevel | None] = {"default": None, "minimal": "minimal", "low": "low"}
 
 
+class Pacer:
+    """İki çağrının başlangıcı arasında en az ``interval`` saniye bırakır.
+
+    Tek bir Pacer tüm seviyeler için paylaşılır; böylece bir seviyenin son çağrısı ile
+    sonrakinin ilk çağrısı arasında da beklenir (PR #4 review #2). ``clock`` ve ``sleep``
+    testlerde sahte saatle değiştirilebilsin diye parametredir.
+    """
+
+    def __init__(
+        self,
+        interval: float,
+        clock: Callable[[], float] = time.monotonic,
+        sleep: Callable[[float], None] = time.sleep,
+    ) -> None:
+        self.interval = interval
+        self._clock = clock
+        self._sleep = sleep
+        self._last: float | None = None
+
+    def wait(self) -> None:
+        """Gerekirse bekler, sonra bu çağrının başlangıç zamanını not eder."""
+        if self._last is not None:
+            remaining = self._last + self.interval - self._clock()
+            if remaining > 0:
+                self._sleep(remaining)
+        self._last = self._clock()
+
+
 def load_records(name: str) -> dict[str, dict[str, Any]]:
     """Bir seviyenin kayıtlı sonuçlarını id'ye göre döndürür (dosya yoksa boş)."""
     path = RESULTS_DIR / f"intent_{name}.json"
@@ -45,7 +75,7 @@ def run_level(
     cases: list[dict],
     name: str,
     client: httpx.Client,
-    delay: float,
+    pacer: Pacer,
     previous: dict[str, dict[str, Any]],
 ) -> list[dict[str, Any]]:
     """Soruları tek seviyede sorar; her sorudan sonra dosyaya yazar.
@@ -54,7 +84,6 @@ def run_level(
     sonrası kaydetmek, koşu yarıda çökerse elde edilen sonuçların kaybolmasını önler.
     """
     records: list[dict[str, Any]] = []
-    called = False
     for i, case in enumerate(cases):
         old = previous.get(case["id"])
         if old is not None and old["label"] is not None:
@@ -62,9 +91,7 @@ def run_level(
             continue
         record: dict[str, Any] = {"id": case["id"], "expected": case["expected"], "label": None}
         # Kota aşımını önlemek için çağrılar arasında bekleriz; bekleme süreye sayılmaz.
-        if called:
-            time.sleep(delay)
-        called = True
+        pacer.wait()
         start = time.perf_counter()
         try:
             result = classify_intent(case["question"], thinking_level=LEVELS[name], client=client)
@@ -165,8 +192,11 @@ def report() -> None:
 
 def main() -> None:
     # Windows konsolu varsayılan olarak cp1252 kullanır ve "ı", "ş" gibi harfleri basamaz.
-    # En başta yapılır: --help de Türkçe metin yazdırır.
-    sys.stdout.reconfigure(encoding="utf-8")
+    # En başta yapılır: --help de Türkçe metin yazdırır. sys.stdout'un tipi genel TextIO'dur;
+    # reconfigure yalnız TextIOWrapper'da var. isinstance hem pyright'a tipi kanıtlar hem de
+    # stdout başka bir nesneyle değiştirildiyse (ör. test yakalaması) çökmeyi önler.
+    if isinstance(sys.stdout, io.TextIOWrapper):
+        sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -190,12 +220,14 @@ def main() -> None:
     load_dotenv()
     cases = json.loads(CASES_PATH.read_text(encoding="utf-8"))
     print(f"{len(cases)} soru x {len(args.levels)} seviye, çağrı arası {delay:.1f} sn\n")
+    # Tüm seviyeler tek Pacer'ı paylaşır: seviye geçişinde de dakika sınırı korunur.
+    pacer = Pacer(delay)
     # Tek bağlantı havuzu: her çağrıda yeni TCP/TLS bağlantısı açmayız.
     with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
         for name in args.levels:
             print(f"[{name}]", flush=True)
             previous = load_records(name) if args.resume else {}
-            run_level(cases, name, client, delay, previous)
+            run_level(cases, name, client, pacer, previous)
             print(f"Kaydedildi: evals/results/intent_{name}.json\n", flush=True)
     report()
 

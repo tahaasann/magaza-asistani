@@ -105,3 +105,19 @@ def test_eval_cases_are_well_formed() -> None:
     labels = Counter(case["expected"] for case in cases)
     assert set(labels) == set(get_args(IntentLabel))
     assert min(labels.values()) >= 5, "her etiketten en az 5 soru olmalı"
+
+
+def test_default_thinking_level_is_minimal() -> None:
+    # Eval kararı (minimal: aynı doğruluk, 0 düşünme token'ı) varsayılan olarak gönderilmeli.
+    client, seen = make_client(INTENT_OK)
+    classify_intent("Fire kaydı nasıl girilir?", client=client)
+    assert json.loads(seen[0].content)["generation_config"]["thinking_level"] == "minimal"
+
+
+def test_invalid_output_error_is_truncated() -> None:
+    # Ham cevap kişisel veri taşıyabilir; hata mesajı yalnız kısa bir önizleme içermeli.
+    client, _ = make_client(body_with_text("x" * 500))
+    with pytest.raises(ValueError) as exc_info:
+        classify_intent("Selam", client=client)
+    assert "x" * 101 not in str(exc_info.value)
+    assert "x" * 100 in str(exc_info.value)
